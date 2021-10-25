@@ -35,6 +35,8 @@ otter_ci <- t.test(otter_lengths)
 # Find the standard deviation
 
 otter_sd <- sd(otter_lengths)
+
+n_otter <- length(otter_lengths)
 ```
 
 95% confidence interval means that if you took multiple samples from this population, you'd expect 95% of those sample confidence intervals to contain the true population mean. 
@@ -42,7 +44,105 @@ otter_sd <- sd(otter_lengths)
 Mean otter length is 33.8 ($\pm$ 10.8, n=9) inches with a 95% confidence interval of [25.5,42.1] inches. 
 
 #### Now, using in-line referencing 
-Mean otter length is `r round(otter_ci$estimate,1)` inches
+Mean otter length is `r round(otter_ci$estimate,1)` inches, with a 95% confidence interval of [`r round(otter_ci$conf.int[1],1)`,`r round(otter_ci$conf.int[2],1)`] inches.
+
+## Part 2: Two-sample t-tests
+
+### Example 1
+
+Make two mock samples, ask the question: do we have sufficient evidence to make us reject the null hypothesis that these samples were drawn from populations with the same mean. 
+
+```{r}
+# Make my mock samples
+
+oak_trees <- c(45,39,44,60,43)
+
+pine_trees <- c(85,72,76,77,105,69)
+
+# Two-sample t-test
+tree_t <- t.test(oak_trees,pine_trees)
+
+# Null hypothesis means heights are the same
+#i.e. : Trees are drawn from populations with the same mean height
+
+
+
+```
+
+ P - value of xxx means there is a XXX % chance that if these are samples from populations with the same mean, the samples will be at least this far apart. In this case, the low p-value means there is a very low chance that these samples come from populations with the same mean. 
+
+
+The mean heights of oak and pine trees were (46.2 +- (sd)) and (80.7 +- (sd)), respectively, and the different was not significant (t(`r round(tree_t$parameter,1)`) = `r round(tree_t$statistic,1)`, p = `r round(tree_t$p.value,1)`)
+
+"t(df) = t-statistic, p = p-value"
+
+*AVOID* p=0 
+When things get really small, use P < 0.001
+
+
+## Part 3: Another t-test with car data
+
+### Take a look at the data
+
+```{r}
+compact_suv <- mpg %>% 
+  filter(class %in% c("compact","suv"))
+# Check for remaining levels 
+
+unique(compact_suv$class)
+
+```
+
+
+Create a histogram of city (cty) gas mileage, faceted by class, starting from compact_suv
+
+```{r}
+ggplot(compact_suv,aes(x=cty))+
+geom_histogram(bins = 12, fill="forestgreen") + 
+  theme_bw()+
+  facet_wrap(~class)
+
+
+ggplot(data = compact_suv, aes(sample = cty))+
+  geom_qq()+
+  facet_wrap(~class)
+
+```
+
+Find some summary statistics for each group
+ 
+```{r}
+car_stats <- compact_suv %>% 
+  group_by(class) %>% 
+  summarize(
+    mean_city = round(mean(cty),2),
+    sd_city = round(sd(cty),2),
+    sample_size = n()         )
+  
+```
+ 
+The t.test function REALLY wants vectors of things. 
+
+```{r}
+compact_sample <- compact_suv %>% 
+  filter(class == "compact") %>% 
+  pull(cty)
+
+# Your turn, do the same thing to get a vector of city gas mileages for SUVS
+
+suv_sample <- compact_suv %>% 
+  filter(class == "suv") %>% 
+  pull(cty)
+```
+
+H0: Mean city gas mileages for SUVS and compact cars are the same
+
+```{r}
+t.test(compact_sample,suv_sample)
+```
+
+There is a significant difference in mean city gas mileage for SUVs and compact cars. t(df) = t-statistic, p <0.001.
+
 
 
 
