@@ -2,29 +2,48 @@
 title: "Lab 5"
 author: "Evie Vermeer"
 date: "10/25/2021"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
+    code_folding: hide
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=TRUE, echo= TRUE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(effsize)
 ```
 
-## R Markdown
+## Part 1: Confidence Intervals
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+In this section, we'll use the t.test() function to calculate confidence intervals
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+### Example 1
 
-```{r cars}
-summary(cars)
+Create a single mock sample containing a number of values, then learn to use t.test() to return confidence intervals, and learn about in-line code referencing so our tesxt becomes more reproducible, too. 
+
+```{r}
+# Create a mock sample - using c() to create a vector
+
+otter_lengths <- c(30,28,22,25,32,26,54,45,42)
+
+# Find the confidence interval from our sample:
+
+otter_ci <- t.test(otter_lengths)
+
+# Find the standard deviation
+
+otter_sd <- sd(otter_lengths)
 ```
 
-## Including Plots
+95% confidence interval means that if you took multiple samples from this population, you'd expect 95% of those sample confidence intervals to contain the true population mean. 
 
-You can also embed plots, for example:
+Mean otter length is 33.8 ($\pm$ 10.8, n=9) inches with a 95% confidence interval of [25.5,42.1] inches. 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+#### Now, using in-line referencing 
+Mean otter length is `r round(otter_ci$estimate,1)` inches
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
